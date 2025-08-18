@@ -3,12 +3,12 @@ import pandas as pd
 from pathlib import Path
 
 RAW = Path("../data/raw")
-DB_PATH = Path("../data/ieee_fraud.duckdb")
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "ieee_fraud.duckdb"
 
 FILES = {
-    "train_transation": RAW / "train_transaction.csv",
+    "train_transaction": RAW / "train_transaction.csv",
     "train_identity":   RAW / "train_identity.csv",
-    "test_transation":  RAW / "test_transaction.csv",
+    "test_transaction":  RAW / "test_transaction.csv",
     "test_identity":    RAW / "test_identity.csv",
 }
 
@@ -25,9 +25,9 @@ def main():
     conn = duckdb.connect(str(DB_PATH))
     
     # Load train & test tables
-    load_csv_to_duckdb(conn, "train_transation", FILES["train_transation"])
+    load_csv_to_duckdb(conn, "train_transaction", FILES["train_transaction"])
     load_csv_to_duckdb(conn, "train_identity", FILES["train_identity"])
-    load_csv_to_duckdb(conn, "test_transation", FILES["test_transation"])
+    load_csv_to_duckdb(conn, "test_transaction", FILES["test_transaction"])
     load_csv_to_duckdb(conn, "test_identity", FILES["test_identity"])
     
     # Basic sanity checks
@@ -47,7 +47,7 @@ def main():
     
     conn.execute("DROP VIEW IF EXISTS test_joined")
     conn.execute("""
-                 CREATE VIEW test_joined
+                 CREATE VIEW test_joined AS
                  SELECT *
                  FROM test_transaction t
                  LEFT JOIN test_identity i USING (TransactionID)
