@@ -8,6 +8,8 @@ from typing import List, Dict, Any
 import numpy as np
 import pandas as pd
 
+from pandas.api.types import is_datetime64_any_dtype, is_numeric_dtype
+
 
 @dataclass(frozen=True)
 class Config:
@@ -26,14 +28,26 @@ def load_dataset(cfg: Config) -> pd.DataFrame:
     return df
 
 
-def verify_columns(df: pd.DataFrame, required: tuple[str, ...]) -> None:
+def verify_columns(df: pd.DataFrame, required: tuple[str, ...]) -> pd.DataFrame:
     missing = [c for c in required if c not in df.columns]
     assert not missing, f"Missing required columns: {missing}"
-    # Soft checks on dtypes
+
+    # target must be binary
     assert df["isFraud"].dropna().isin([0, 1]).all(), "isFraud must be binary 0/1"
-    # Prefer dt; if present ensure datetime-like
+
+    # dt: if present and not datetime, try to coerce
     if "dt" in df.columns:
-        assert np.issubdtype(df["dt"].dtype, np.datetime64), "dt exists but is not datetime dtype"
+        if not is_datetime64_any_dtype(df["dt"]):
+            df["dt"] = pd.to_datetime(df["dt"], errors="coerce", utc=False)
+        assert is_datetime64_any_dtype(df["dt"]), "dt exists but is not datetime after coercion"
+        nat_rate = df["dt"].isna().mean()
+        assert nat_rate < 0.001, f"Too many invalid datetimes in dt after coercion (NaT rate={nat_rate:.3f})"
+
+    # TransactionDT: should be numeric seconds
+    if "TransactionDT" in df.columns:
+        assert is_numeric_dtype(df["TransactionDT"]), "TransactionDT must be numeric"
+
+    return df
 
 
 def class_balance(df: pd.DataFrame) -> dict[str, Any]:
