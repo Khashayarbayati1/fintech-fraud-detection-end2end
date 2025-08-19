@@ -10,8 +10,8 @@
     "weekday"
   ],
   "drop_candidates_not_found": [],
-  "n_features_total": 419,
-  "n_numeric": 390,
+  "n_features_total": 420,
+  "n_numeric": 391,
   "n_categorical": 29,
   "numeric": [
     "C1",
@@ -43,6 +43,7 @@
     "D8",
     "D9",
     "TransactionAmt",
+    "TransactionID_1",
     "V1",
     "V10",
     "V100",

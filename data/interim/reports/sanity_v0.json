@@ -1,7 +1,7 @@
 {
   "dataset_path": "/Users/khashayarbayati/Documents/Uni/Coursera/fraud_detection/fintech-fraud-detection-end2end/fintech-fraud-detection-end2end/data/interim/train_clean_baseline.parquet",
   "n_rows": 590540,
-  "n_cols": 426,
+  "n_cols": 427,
   "head_columns": [
     "TransactionID",
     "isFraud",
@@ -32,15 +32,15 @@
     "prevalence": 0.03499000914417313
   },
   "top_missing": {
+    "D13": 0.8950926270870728,
+    "D14": 0.8946946862193924,
+    "D12": 0.8904104717715988,
+    "id_04": 0.887762048294781,
+    "id_03": 0.8877095539675551,
+    "D6": 0.8760676668811597,
     "id_33": 0.8758949436109323,
-    "id_30": 0.868654113184543,
-    "id_34": 0.8682477054898906,
-    "DeviceInfo": 0.7990551021099332,
-    "id_16": 0.7809801198902699,
-    "R_emaildomain": 0.7675161716395164,
-    "id_31": 0.7624513157449114,
-    "DeviceType": 0.7615572188166763,
-    "id_28": 0.7612727334304196,
-    "id_29": 0.7612727334304196
+    "id_10": 0.8734615775392014,
+    "id_09": 0.873187252345311,
+    "D9": 0.8731229044603245
   }
 }
