@@ -1,0 +1,22 @@
+{
+  "dataset_path": "/Users/khashayarbayati/Documents/Uni/Coursera/fraud_detection/fintech-fraud-detection-end2end/fintech-fraud-detection-end2end/data/interim/train_clean_baseline.parquet",
+  "time_column": "dt",
+  "dropped_rows_missing_time": 0,
+  "t_cut": "2017-05-22 02:54:13.600000",
+  "train": {
+    "rows": 472432,
+    "time_min": "2017-01-02 00:00:00",
+    "time_max": "2017-05-22 02:54:02",
+    "pos": 16599,
+    "neg": 455833,
+    "prevalence": 0.03513521522674162
+  },
+  "val": {
+    "rows": 118108,
+    "time_min": "2017-05-22 02:55:00",
+    "time_max": "2017-07-02 23:58:51",
+    "pos": 4064,
+    "neg": 114044,
+    "prevalence": 0.034409184813899145
+  }
+}
