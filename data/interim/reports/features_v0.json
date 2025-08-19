@@ -1,6 +1,15 @@
 {
   "dataset_path": "/Users/khashayarbayati/Documents/Uni/Coursera/fraud_detection/fintech-fraud-detection-end2end/fintech-fraud-detection-end2end/data/interim/train_clean_baseline.parquet",
-  "dropped_features": [],
+  "dropped_features": [
+    "TransactionDT",
+    "TransactionID",
+    "day",
+    "dt",
+    "hour",
+    "isFraud",
+    "weekday"
+  ],
+  "drop_candidates_not_found": [],
   "n_features_total": 419,
   "n_numeric": 390,
   "n_categorical": 29,
