@@ -1,20 +1,10 @@
 {
   "dataset_path": "/Users/khashayarbayati/Documents/Uni/Coursera/fraud_detection/fintech-fraud-detection-end2end/fintech-fraud-detection-end2end/data/interim/train_clean_baseline.parquet",
-  "dropped_features": [
-    "TransactionDT",
-    "TransactionID",
-    "TransactionID_1",
-    "day",
-    "dt",
-    "hour",
-    "isFraud",
-    "weekday"
-  ],
-  "drop_candidates_not_found": [],
-  "n_features_total": 419,
+  "time_column": "dt",
+  "t_cut": "2017-05-22 02:54:13.600000",
   "n_numeric": 390,
   "n_categorical": 29,
-  "numeric": [
+  "feature_order": [
     "C1",
     "C10",
     "C11",
@@ -404,9 +394,7 @@
     "id_17",
     "id_19",
     "id_20",
-    "id_32"
-  ],
-  "categorical": [
+    "id_32",
     "DeviceInfo",
     "DeviceType",
     "M1",
@@ -436,5 +424,45 @@
     "id_36",
     "id_37",
     "id_38"
-  ]
+  ],
+  "fitted_on": "train_only",
+  "train_shape_after_transform": [
+    472432,
+    419
+  ],
+  "val_shape_after_transform": [
+    118108,
+    419
+  ],
+  "unseen_val_categories_mapped_to_-1": {
+    "DeviceInfo": 147,
+    "DeviceType": 0,
+    "M1": 0,
+    "M2": 0,
+    "M3": 0,
+    "M4": 0,
+    "M5": 0,
+    "M6": 0,
+    "M7": 0,
+    "M8": 0,
+    "M9": 0,
+    "P_emaildomain": 0,
+    "ProductCD": 0,
+    "R_emaildomain": 0,
+    "card4": 0,
+    "card6": 0,
+    "id_12": 0,
+    "id_15": 0,
+    "id_16": 0,
+    "id_28": 0,
+    "id_29": 0,
+    "id_30": 3,
+    "id_31": 20,
+    "id_33": 48,
+    "id_34": 0,
+    "id_35": 0,
+    "id_36": 0,
+    "id_37": 0,
+    "id_38": 0
+  }
 }

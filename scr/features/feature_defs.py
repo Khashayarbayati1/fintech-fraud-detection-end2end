@@ -13,7 +13,7 @@ from pandas.api.types import is_numeric_dtype, is_bool_dtype
 class Config:
     parquet_path: Path = Path(__file__).resolve().parents[2] / "data" / "interim" / "train_clean_baseline.parquet"
     report_dir: Path = Path(__file__).resolve().parents[2] / "data" / "interim" / "reports"
-    drop_cols: tuple[str, ...] = ("TransactionID", "isFraud", "dt", "TransactionDT", "hour", "day", "weekday")
+    drop_cols: tuple[str, ...] = ("TransactionID", "TransactionID_1", "isFraud", "dt", "TransactionDT", "hour", "day", "weekday")
 
 
 def load_dataset(cfg: Config) -> pd.DataFrame:
