@@ -115,6 +115,25 @@ def build_preprocessor(numeric: list[str], categorical: list[str]) -> ColumnTran
         ("cat", cat_pip, categorical),
     ], remainder="drop")
 
+def write_preprocess_report(cfg: Config, c:UpstreamContracts, preprocess: ColumnTransformer,
+                            X_train_shape: tuple[int, int], X_val_shape: tuple[int, int],
+                            unseen_counts: Dict[int, int] | None = None) -> None:
+    report = {
+        "dataset_path": str(cfg.parquet_path),
+        "time_column": c.time_col,
+        "t_cut": str(c.t_cut),
+        "n_numeric": c.n_numeric,
+        "n_categorical": c.n_categorical,
+        "feature_order": c.numeric + c.categorical,
+        "fitted_on": "train_only",
+        "train_shape_after_transform": X_train_shape,
+        "val_shape_after_transform": X_val_shape,
+        "unseen_val_categories_mapped_to_-1": "unseen_counts" or {},
+    }
+    (cfg.reports_dir).mkdir(parents=True, exist_ok=True)
+    with open(cfg.reports_dir / cfg.out_report_file, "w") as f:
+        json.dump(report, f, indent=2)
+        
 def main():
     cfg = Config()
     
@@ -140,6 +159,14 @@ def main():
     Xva = preproc.transform(X_val)
     
     joblib.dump(preproc, cfg.model_dir / cfg.out_prep_file)
+    
+    unseen_counts = {}
+    for col in contracts.categorical:
+        tr_vals = set(train_df[col].dropna().unique().tolist())
+        val_vals = set(val_df[col].dropna().unique().tolist())
+        unseen_counts[col] = len(val_vals - tr_vals)
+    
+    write_preprocess_report(cfg, contracts, preproc, Xtr.shape, Xva.shape, unseen_counts)
 
     
 if __name__ == "__main__":
