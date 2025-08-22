@@ -1,0 +1,32 @@
+{
+  "t_cut": "2017-05-22 02:54:13.600000",
+  "train_rows": 472432,
+  "val_rows": 118108,
+  "train_prevalence": 0.03513521522674162,
+  "val_prevalence": 0.034409184813899145,
+  "n_features_total": 419,
+  "categorical_handling": "ordinal_encoded, unknown=-1",
+  "imbalance_handling": {
+    "pos": 16599,
+    "neg": 455833,
+    "scale_pos_weight": 27.46
+  },
+  "lightgbm_params": {
+    "objective": "binary",
+    "metric": [
+      "average_precision",
+      "auc"
+    ],
+    "learning_rate": 0.05,
+    "n_estimators": 5000,
+    "early_stopping_rounds": 100,
+    "num_leaves": 31,
+    "min_data_in_leaf": 100,
+    "feature_fraction": 0.9,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 1,
+    "scale_pos_weight": 27.46,
+    "random_state": 42
+  },
+  "eval_protocol": "eval_set = val, keep best_iteration, log AUC and PR-AUC"
+}
