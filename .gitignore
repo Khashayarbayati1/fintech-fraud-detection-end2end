@@ -218,7 +218,13 @@ data/processed/
 # DuckDB database files
 *.duckdb
 
-*.pkl
+# Serialized artifacts
 *.joblib
-models/
-!scr/models/   # force include the one in scr/
+*.pkl
+
+# Ignore saved models in top-level
+/models/
+
+# Keep only Python code in scr/models
+!scr/models/*.py
+scr/models/__pycache__/
