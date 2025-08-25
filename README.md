@@ -67,6 +67,17 @@ Parameters were chosen for stability and imbalance handling (`scale_pos_weight`)
 - Precision–Recall Curve: `data/interim/figures/pr_val.png`  
 - Precision@K Curve: `data/interim/figures/precision_at_k_val.png`  
 - Recall@FPR Curve: `data/interim/figures/recall_at_fpr_val.png`
+### Curves
+
+<p float="left">
+  <img src="../data/interim/figures/roc_val.png" width="45%" />
+  <img src="../data/interim/figures/pr_val.png" width="45%" />
+</p>
+
+<p float="left">
+  <img src="../data/interim/figures/precision_at_k_val.png" width="45%" />
+  <img src="../data/interim/figures/recall_at_fpr_val.png" width="45%" />
+</p>
 
 The curves confirm that the classifier meaningfully ranks fraud cases above legitimate ones. PR curve shows strong lift across thresholds; Precision@K is useful for operational scenarios (e.g., top 1% flagged transactions). Recall@FPR curve helps if there’s a target false-positive budget.
 
