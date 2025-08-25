@@ -79,7 +79,41 @@ Parameters were chosen for stability and imbalance handling (`scale_pos_weight`)
   <img src="data/interim/figures/recall_at_fpr_val.png" width="45%" />
 </p>
 
-The curves confirm that the classifier meaningfully ranks fraud cases above legitimate ones. PR curve shows strong lift across thresholds; Precision@K is useful for operational scenarios (e.g., top 1% flagged transactions). Recall@FPR curve helps if there’s a target false-positive budget.
+#### ROC Curve (AUC ≈ 0.911)
+- **What it shows:** Trade-off between True Positive Rate (TPR/recall) and False Positive Rate (FPR) as the threshold moves.
+- **How to read:** Curve far above the diagonal → strong ability to rank fraud > non-fraud across thresholds.
+- **Why it matters:** Good global separability; however, ROC can look optimistic on highly imbalanced data (like ours), so pair with PR.
+
+#### Precision–Recall (PR) Curve (PR-AUC ≈ 0.524; baseline ≈ 0.034)
+- **What it shows:** Precision (purity of alerts) vs. recall (coverage of fraud) across thresholds.
+- **Baseline:** The dashed line at **0.034** is the no-skill precision (fraud prevalence). Anything above it is real lift.
+- **Our curve:** Stays well above baseline across recalls → the model concentrates frauds near the top of scores.
+- **Operational take:** As we push recall higher, precision falls (more false alarms). Choose thresholds based on analyst capacity and tolerance for FPs.
+
+#### Precision@Top-K% (triage view)
+- **What it shows:** If we only review the **top K%** highest-risk transactions, what fraction are actual fraud?
+- **Our results (approx.):**  
+  - **Top 1%:** precision ~**0.9** → most reviewed cases are true fraud.  
+  - **Top 2%:** precision ~**0.67**.  
+  - **Top 5%:** precision ~**0.39**.
+- **Operational take:** Lets ops pick K to match daily review bandwidth. High precision at small K enables a reliable “high-risk queue.”
+
+#### Recall@FPR (customer-impact view)
+- **What it shows:** With a cap on **FPR** (share of legit transactions incorrectly flagged), how much **recall** (fraud caught) do we get?
+- **Our results (approx.):**  
+  - **FPR 0.1%:** recall ~**0.23**  
+  - **FPR 0.5%:** recall ~**0.37**  
+  - **FPR 1.0%:** recall ~**0.43**  
+  - **FPR 2.0%:** recall ~**0.50+**
+- **Operational take:** Use when product sets an FP budget (e.g., “≤1% legit users impacted”); we then read off expected fraud coverage.
+
+#### Putting it together
+- **Model ranks well** (ROC-AUC ~0.91) **and delivers real lift** over prevalence (PR-AUC ~0.52 vs 0.034 baseline).
+- **Threshold selection is key:**  
+  - If review capacity is scarce → target **Precision@K** (e.g., top 1–2%).  
+  - If customer friction must be minimal → target **Recall@FPR** (e.g., FPR ≤ 1%).  
+  - If you want a single balanced point → use **best-F1** (we observed thr ≈ 0.81 → P≈0.55, R≈0.46).
+- **Caveat:** Curves are from **validation** only; thresholds selected here should be re-validated on a held-out test or in a shadow deployment.
 
 ---
 
@@ -94,7 +128,6 @@ The curves confirm that the classifier meaningfully ranks fraud cases above legi
 - PR-AUC ≈ **0.608 ± 0.043**  
 - Details saved in: `data/interim/reports/cv_time_splits_v0.json`
 
-👉 **Interpretation:**  
 The baseline model generalizes well across different time splits. ROC is consistently high; PR fluctuates more due to prevalence shifts — expected in fraud detection.
 
 ---
@@ -103,7 +136,6 @@ The baseline model generalizes well across different time splits. ROC is consist
 
 - V258, C13, V294, C8, card1, card2, TransactionAmt, M4, C1, card6, C14, V70, addr1, D2, C11
 
-👉 **Interpretation:**  
 The model emphasizes card features, transaction amount, address, and time-derived/engineered V* and C* variables. These are plausible fraud signals — no obvious “nonsense” features dominating, which increases trust in the baseline.
 
 ---
@@ -112,7 +144,7 @@ The model emphasizes card features, transaction amount, address, and time-derive
 
 - Artifacts saved:  
   - `models/baseline_lgbm.pkl`  
-  - `data/interim/reports/metrics_v0.json`  
+  - `data/interim/reports/baseline_summary_v0.json`  
   - `data/interim/reports/eval_summary_v0.json`
 - Random state pinned (`42`)  
 - Preprocessor frozen (no re-fit on val)  
