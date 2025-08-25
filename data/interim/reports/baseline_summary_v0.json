@@ -1,0 +1,111 @@
+{
+  "best_iteration": 413,
+  "val_auc_roc": 0.9114586368377782,
+  "val_pr_auc": 0.5244223402809307,
+  "train_time_seconds": 29.19375187496189,
+  "n_trees_cap": 5000,
+  "early_stopping_rounds": 100,
+  "scale_pos_weight": 27.46,
+  "top_importances_gain": [
+    {
+      "feature": "num__V258",
+      "gain": 840110.288848877
+    },
+    {
+      "feature": "num__C13",
+      "gain": 450528.7972679138
+    },
+    {
+      "feature": "num__V294",
+      "gain": 423858.5293006897
+    },
+    {
+      "feature": "num__C8",
+      "gain": 214850.84519195557
+    },
+    {
+      "feature": "num__card1",
+      "gain": 214578.45777511597
+    },
+    {
+      "feature": "num__card2",
+      "gain": 190997.81799697876
+    },
+    {
+      "feature": "num__TransactionAmt",
+      "gain": 186750.84102630615
+    },
+    {
+      "feature": "cat__M4",
+      "gain": 152306.7751312256
+    },
+    {
+      "feature": "num__C1",
+      "gain": 151685.38681793213
+    },
+    {
+      "feature": "cat__card6",
+      "gain": 150835.45240402222
+    },
+    {
+      "feature": "num__C14",
+      "gain": 145486.4917526245
+    },
+    {
+      "feature": "num__V70",
+      "gain": 134655.62894439697
+    },
+    {
+      "feature": "num__addr1",
+      "gain": 118864.71646499634
+    },
+    {
+      "feature": "num__D2",
+      "gain": 112540.7880859375
+    },
+    {
+      "feature": "num__C11",
+      "gain": 106875.06470489502
+    },
+    {
+      "feature": "num__D3",
+      "gain": 101732.57099914551
+    },
+    {
+      "feature": "num__D15",
+      "gain": 90156.56996917725
+    },
+    {
+      "feature": "cat__R_emaildomain",
+      "gain": 89914.51137542725
+    },
+    {
+      "feature": "num__C5",
+      "gain": 84796.03591156006
+    },
+    {
+      "feature": "num__V312",
+      "gain": 83633.28913116455
+    },
+    {
+      "feature": "num__D1",
+      "gain": 83181.13165283203
+    },
+    {
+      "feature": "num__V91",
+      "gain": 82747.0616531372
+    },
+    {
+      "feature": "num__C2",
+      "gain": 75453.00463104248
+    },
+    {
+      "feature": "num__card5",
+      "gain": 74964.46886825562
+    },
+    {
+      "feature": "num__D10",
+      "gain": 72244.51398468018
+    }
+  ]
+}

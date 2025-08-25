@@ -14,8 +14,8 @@
   "lightgbm_params": {
     "objective": "binary",
     "metric": [
-      "average_precision",
-      "auc"
+      "auc",
+      "average_precision"
     ],
     "learning_rate": 0.05,
     "n_estimators": 5000,
