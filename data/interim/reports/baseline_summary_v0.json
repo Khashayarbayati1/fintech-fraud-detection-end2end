@@ -2,10 +2,34 @@
   "best_iteration": 413,
   "val_auc_roc": 0.9114586368377782,
   "val_pr_auc": 0.5244223402809307,
-  "train_time_seconds": 29.19375187496189,
+  "train_time_seconds": 17.481784750008956,
   "n_trees_cap": 5000,
   "early_stopping_rounds": 100,
   "scale_pos_weight": 27.46,
+  "val_prevalence": 0.034409184813899145,
+  "pr_baseline": 0.034409184813899145,
+  "thr_0_5": {
+    "threshold": 0.5,
+    "precision": 0.23014835882850335,
+    "recall": 0.7367125984251969,
+    "f1": 0.3507292215779301,
+    "tp": 2994,
+    "fp": 10015,
+    "tn": 104029,
+    "fn": 1070
+  },
+  "thr_best_f1": {
+    "threshold": 0.8113177125114373,
+    "precision": 0.5512595196250732,
+    "recall": 0.4630905511811024,
+    "f1": 0.5033431398769724,
+    "tp": 1882,
+    "fp": 1532,
+    "tn": 112512,
+    "fn": 2182,
+    "precision_curve": 0.5512595196250732,
+    "recall_curve": 0.4630905511811024
+  },
   "top_importances_gain": [
     {
       "feature": "num__V258",

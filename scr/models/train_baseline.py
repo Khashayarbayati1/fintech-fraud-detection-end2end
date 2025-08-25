@@ -14,7 +14,9 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OrdinalEncoder
-from sklearn.metrics import roc_auc_score, average_precision_score
+from sklearn.metrics import (roc_auc_score, average_precision_score,
+                            precision_recall_curve, precision_score, 
+                            recall_score, f1_score, confusion_matrix)
 
 import lightgbm as lgb
 from lightgbm import LGBMClassifier
@@ -141,7 +143,17 @@ def try_feature_names(preproc, feature_order: list[str]) -> list[str] | None:
         return list(preproc.get_feature_names_out(feature_order))
     except Exception:
         return None
-     
+
+# ---- Metrics at threshold = 0.5 ----
+def thr_metrics(y_true, y_score, thr: float) -> dict:
+    y_hat = (y_score >= thr).astype(int)
+    prec = float(precision_score(y_true, y_hat, zero_division=0))
+    rec  = float(recall_score(y_true, y_hat, zero_division=0))
+    f1   = float(f1_score(y_true, y_hat, zero_division=0))
+    tn, fp, fn, tp = confusion_matrix(y_true, y_hat, labels=[0,1]).ravel()
+    return {"threshold": thr, "precision": prec, "recall": rec, "f1": f1,
+            "tp": int(tp), "fp": int(fp), "tn": int(tn), "fn": int(fn)}
+         
 def main():
     cfg = Config()
     reports = read_reports(cfg)
@@ -257,6 +269,29 @@ def main():
     val_ap  = float(average_precision_score(y_val, p_val))
     print(f"VAL ROC-AUC: {val_auc:.6f}  |  VAL PR-AUC (AP): {val_ap:.6f}")
     
+    # ---- Prevalence & PR "no-skill" baseline ----
+    val_prevalence = float(y_val.mean())        # share of positives in val
+    pr_baseline = val_prevalence                # no-skill PR-AUC baseline
+    
+    # ---- Metrics at threshold = 0.5 ----
+    at_05 = thr_metrics(y_val, p_val, 0.5)
+    
+    # ---- Best-F1 on validation ----
+    prec, rec, thr = precision_recall_curve(y_val, p_val)   # len(thr) = len(prec) - 1
+    # avoid division by zero
+    den = (prec[:-1] + rec[:-1])
+    den[den == 0.0] = 1e-12
+    f1s = 2 * prec[:-1] * rec[:-1] / den
+    ix = int(np.argmax(f1s))
+    best_thr = float(thr[ix])
+    best_f1_metrics = thr_metrics(y_val, p_val, best_thr)
+    best_f1_metrics.update({"precision_curve": float(prec[ix]), "recall_curve": float(rec[ix])})
+
+    print(f"Val prevalence (PR baseline): {val_prevalence:.4f}")
+    print(f"@0.5  P={at_05['precision']:.3f} R={at_05['recall']:.3f} F1={at_05['f1']:.3f}")
+    print(f"@bestF1 thr={best_thr:.4f}  P={best_f1_metrics['precision']:.3f} "
+        f"R={best_f1_metrics['recall']:.3f} F1={best_f1_metrics['f1']:.3f}")
+
     # Persist model & metrics
     model_out_path   = cfg.model_dir / cfg.out_model_file
     metrics_out_path = cfg.reports_dir / cfg.out_metrics_file
@@ -271,6 +306,10 @@ def main():
         "n_trees_cap": int(base_params["n_estimators"]),
         "early_stopping_rounds": stopping_rounds,
         "scale_pos_weight": contracts.scale_pos_weight,
+        "val_prevalence": val_prevalence,
+        "pr_baseline": pr_baseline,
+        "thr_0_5": at_05,
+        "thr_best_f1": best_f1_metrics,
     }
     
     # Top feature importances (may not align 1:1 with original names after encoding)
