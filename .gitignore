@@ -221,3 +221,4 @@ data/processed/
 *.pkl
 *.joblib
 models/
+!scr/models/   # force include the one in scr/
