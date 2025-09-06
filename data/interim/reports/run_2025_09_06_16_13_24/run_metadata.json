@@ -1,0 +1,14 @@
+{
+  "run_id": "2025_09_06_16_13_24",
+  "score_type": "probability",
+  "time_column": "dt",
+  "t_cut": "2017-05-22 02:54:13.600000",
+  "model_file": "baseline_lgbm.pkl",
+  "preprocessor_file": "preprocessor_baseline.pkl",
+  "features_version": "features_v0.json",
+  "preprocess_version": "preprocess_v0.json",
+  "split_version": "split_v0.json",
+  "rows_val": 118108,
+  "positives_val": 4064,
+  "prevalence_val": 0.034409184813899145
+}
