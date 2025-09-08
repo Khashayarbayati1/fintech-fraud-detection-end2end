@@ -11,6 +11,7 @@ from datetime import datetime
 @dataclass(frozen=True)
 class Config:
     root: Path = Path(__file__).resolve().parents[2]
+    interim_path: Path = root / "data" / "interim" 
     parquet_path: Path = root / "data" / "interim" / "train_clean_baseline.parquet"
     reports_dir: Path = root / "data" / "interim" / "reports"
     model_dir: Path = root / "models"
@@ -38,7 +39,7 @@ def main():
 
     # run id
     run_id = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    out_dir = cfg.reports_dir / f"run_{run_id}"
+    out_dir = cfg.interim_path / f"run_{run_id}"
     out_dir.mkdir(parents=True, exist_ok=True)
     print(f"[INFO] Run ID = {run_id}")
     
@@ -95,7 +96,7 @@ def main():
         "positives_val": int(y_val.sum()),
         "prevalence_val": prevalence,
     }
-    with open(out_dir / "run_metadata.json", "w") as f:
+    with open(cfg.reports_dir / "harden_baseline_metadata.json", "w") as f:
         json.dump(meta, f, indent=2)
     
     # write output
