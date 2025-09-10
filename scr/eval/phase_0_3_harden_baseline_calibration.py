@@ -1,3 +1,4 @@
+import os  
 import json
 import numpy as np
 import pandas as pd
@@ -251,6 +252,9 @@ def main():
     rel_iso_path = cfg.figures_dir / "reliability_iso.png"
     rel_platt_path = cfg.figures_dir / "reliability_platt.png"
     rel_overlay_path = cfg.figures_dir / "reliability_overlay.png"
+    iso_rel     = os.path.relpath(rel_iso_path,     start=cfg.reports_dir)
+    platt_rel   = os.path.relpath(rel_platt_path,   start=cfg.reports_dir)
+    overlay_rel = os.path.relpath(rel_overlay_path, start=cfg.reports_dir)
     _save_single_reliability(y_ho, p_iso, rel_iso_path, n_bins=10, strategy="quantile")
     _save_single_reliability(y_ho, p_platt, rel_platt_path, n_bins=10, strategy="quantile")
     _save_overlay_reliability(y_ho, p_raw, p_platt, p_iso, rel_overlay_path, n_bins=10, strategy="uniform")
@@ -296,9 +300,9 @@ def main():
         f.write(f"- Figures: `{rel_iso_path.name}`, `{rel_platt_path.name}`, `{rel_overlay_path.name}`\n")
         ### Curves
         f.write('<p style="display:flex;gap:10px;flex-wrap:wrap;">\n')
-        f.write(f'  <img src="{rel_iso_path.name}" alt="Isotonic" width="320"/>\n')
-        f.write(f'  <img src="{rel_platt_path.name}" alt="Platt" width="320"/>\n')
-        f.write(f'  <img src="{rel_overlay_path.name}" alt="Overlay" width="640"/>\n')
+        f.write(f'  <img src="{iso_rel}" alt="Isotonic" width="320"/>\n')
+        f.write(f'  <img src="{platt_rel}" alt="Platt" width="320"/>\n')
+        f.write(f'  <img src="{overlay_rel}" alt="Overlay" width="640"/>\n')
         f.write("</p>\n")
 
         f.write("- Notes:\n")
