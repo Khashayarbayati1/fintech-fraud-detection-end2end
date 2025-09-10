@@ -294,6 +294,13 @@ def main():
         f.write(line("platt", topk_platt))
         f.write(f"\n- Chosen calibrator: **{best}**\n")
         f.write(f"- Figures: `{rel_iso_path.name}`, `{rel_platt_path.name}`, `{rel_overlay_path.name}`\n")
+        ### Curves
+        f.write('<p style="display:flex;gap:10px;flex-wrap:wrap;">\n')
+        f.write(f'  <img src="{rel_iso_path.name}" alt="Isotonic" width="320"/>\n')
+        f.write(f'  <img src="{rel_platt_path.name}" alt="Platt" width="320"/>\n')
+        f.write(f'  <img src="{rel_overlay_path.name}" alt="Overlay" width="640"/>\n')
+        f.write("</p>\n")
+
         f.write("- Notes:\n")
         f.write("  - Monotone calibration preserves ranking (ROC/PR unchanged up to ties).\n")
         f.write("  - Use calibrated probabilities for policy thresholds, SLAs, and cost curves.\n")

@@ -12,6 +12,11 @@
 
 - Chosen calibrator: **isotonic**
 - Figures: `reliability_iso.png`, `reliability_platt.png`, `reliability_overlay.png`
+<p style="display:flex;gap:10px;flex-wrap:wrap;">
+  <img src="reliability_iso.png" alt="Isotonic" width="320"/>
+  <img src="reliability_platt.png" alt="Platt" width="320"/>
+  <img src="reliability_overlay.png" alt="Overlay" width="640"/>
+</p>
 - Notes:
   - Monotone calibration preserves ranking (ROC/PR unchanged up to ties).
   - Use calibrated probabilities for policy thresholds, SLAs, and cost curves.
