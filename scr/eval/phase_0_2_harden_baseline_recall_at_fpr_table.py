@@ -140,7 +140,7 @@ def main():
         "alerts", "alerts_per_day"
     ])
 
-    # (Option A) write a standalone file for sanity checks:
+    # write a standalone file for sanity checks:
     out_path = cfg.reports_dir / "baseline_recall_at_fpr.csv"
     out.to_csv(out_path, index=False)
     print(f"Wrote {out_path}")
