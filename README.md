@@ -195,6 +195,6 @@ python eval/phase_04_curves_after_calibration.py
 ```
 
 - Artifacts saved:  
-  -Reports: data/interim/reports/
-  -Figures: data/interim/figures/
-  -Models (calibrator): models/
+  - Reports: data/interim/reports/
+  - Figures: data/interim/figures/
+  - Models (calibrator): models/
