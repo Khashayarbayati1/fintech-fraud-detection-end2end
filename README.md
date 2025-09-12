@@ -192,6 +192,7 @@ python eval/phase_03_calibration.py
 
 # 4) Curves & operating points AFTER calibration (probability-space thresholds)
 python eval/phase_04_curves_after_calibration.py
+```
 
 - Artifacts saved:  
   -Reports: data/interim/reports/
