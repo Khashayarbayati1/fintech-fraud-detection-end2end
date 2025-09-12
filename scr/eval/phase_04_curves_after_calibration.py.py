@@ -364,5 +364,114 @@ def main():
     out_df.to_csv(csv_path, index=False)
     print(f"Updated operating points → {csv_path}")
 
+    # --- Write per-run operating-points report (Markdown) ---
+    md_path = csv_path.with_suffix(".md")
+
+    unique_days = df["time"].dt.date.nunique()
+    roc_rel = os.path.relpath(out_fig, start=cfg.reports_dir)
+
+    # Split tables
+    topk = op.loc[op["mode"] == "topk",
+                ["budget_value","threshold_prob","precision","recall","fpr","alerts","alerts_per_day"]].copy()
+    fpr_tbl = op.loc[op["mode"] == "fpr",
+                    ["budget_value","threshold_prob","precision","recall","fpr","alerts","alerts_per_day"]].copy()
+
+    def _fmt_budget(v: float) -> str:
+        # 'g' trims trailing zeros; 1 -> '1', 0.5 -> '0.5'
+        return f"{v:g}%"
+
+    def _fmt_rows(df_, is_k: bool):
+        lines = []
+        header = "| K% | threshold (p_cal) | precision | recall | FPR (fraction) | alerts | alerts/day |" if is_k \
+                else "| budget (FPR %) | threshold (p_cal) | precision | recall | FPR (fraction) | alerts | alerts/day |"
+        sep = "|---:|---:|---:|---:|---:|---:|---:|"
+        lines.append(header); lines.append(sep)
+        for _, r in df_.iterrows():
+            budget = _fmt_budget(r["budget_value"])
+            thr = "NA" if pd.isna(r["threshold_prob"]) else f"{r['threshold_prob']:.6f}"
+            lines.append(
+                "| {b} | {t} | {p:.4f} | {rcl:.4f} | {f:.6f} | {a:d} | {ad:.2f} |".format(
+                    b=budget, t=thr, p=r["precision"], rcl=r["recall"],
+                    f=r["fpr"], a=int(r["alerts"]), ad=r["alerts_per_day"]
+                )
+            )
+        return "\n".join(lines)
+
+    topk_md = _fmt_rows(topk.sort_values("budget_value"), is_k=True)
+    fpr_md  = _fmt_rows(fpr_tbl.sort_values("budget_value"), is_k=False)
+
+    # --- quick monotonic sanity badges ---
+    def _badge(ok: bool) -> str:
+        return "✔️" if ok else "⚠️"
+
+    # FPR budgets: recall↑, threshold↓, alerts↑ as budget increases; all FPR ≤ budget
+    fb = fpr_tbl.sort_values("budget_value")
+    f_ok = (fb["recall"].is_monotonic_increasing
+            and fb["threshold_prob"].is_monotonic_decreasing
+            and fb["alerts"].is_monotonic_increasing
+            and (fb["fpr"] <= (fb["budget_value"]/100.0) + 1e-12).all())
+
+    # Top-K: precision non-increasing; recall & FPR ↑; threshold↓
+    tk = topk.sort_values("budget_value")
+    t_ok = (tk["precision"].is_monotonic_decreasing
+            and tk["recall"].is_monotonic_increasing
+            and tk["fpr"].is_monotonic_increasing
+            and tk["threshold_prob"].is_monotonic_decreasing)
+
+    with open(md_path, "w") as f:
+        f.write(f"# Operating Points — Run `{run_id}`\n\n")
+        f.write(f"**Calibrator:** `{cal_type}`  \n")
+        f.write(f"**Window:** `full` (unique days: `{unique_days}`)\n\n")
+        f.write("**Files:**  \n")
+        f.write(f"- Operating points (CSV): `{os.path.basename(csv_path)}`  \n")
+        f.write(f"- ROC/PR (calibrated): `../figures/{os.path.basename(out_fig)}`\n\n")
+
+        # Columns (quick refresher)
+        f.write("## Columns (quick refresher)\n\n")
+        f.write("- **mode** — how the cut is chosen:\n")
+        f.write("  - `fpr`: meet a false-positive-rate **budget** (percent of negatives you’re allowed to flag).\n")
+        f.write("  - `topk`: take the top **K%** of rows by risk.\n")
+        f.write("- **budget_type / budget_value** — the target (FPR % or K %).\n")
+        f.write("- **threshold_prob** — calibrated probability cutoff **τ**; predict 1 if `p_cal ≥ τ`.\n")
+        f.write("- **precision** = TP / (TP+FP)\n")
+        f.write("- **recall** = TP / (TP+FN)\n")
+        f.write("- **fpr** = FP / (FP+TN)  _(fraction; e.g., 0.005 = 0.5%)_\n")
+        f.write("- **alerts** — number of rows flagged at the cut\n")
+        f.write(f"- **alerts_per_day** — `alerts / {unique_days}` (unique days in this window)\n\n")
+
+        # FPR budget table
+        f.write("## FPR-budget rows (risk budget view)\n\n")
+        f.write("You asked for the **largest τ** such that **FPR ≤ budget**.\n\n")
+        f.write(fpr_md + "\n\n")
+        f.write("**Interpretation.** As you **loosen the FPR budget** (e.g., 0.1% → 2%), the **threshold drops**,\n")
+        f.write("**recall increases** (catch more positives), **precision falls** (more false alarms), and **alerts** go up.\n")
+        f.write("All reported FPR values are **fractions** and should be ≤ the chosen budget (in percent) converted to a fraction.\n\n")
+
+        # Top-K table
+        f.write("## Top-K% rows (capacity view)\n\n")
+        f.write("Top **K%** by calibrated probability using a deterministic tie-break (`p_cal ↓, time ↑, id ↑`).\n\n")
+        f.write(topk_md + "\n\n")
+        f.write("**Interpretation.** As **K grows** (e.g., 0.5% → 5%), you review more cases: **precision decreases**,\n")
+        f.write("**recall increases**, **FPR** grows, and the **threshold** is the calibrated probability at the Nₖ-th ranked row.\n\n")
+
+        # ROC/PR
+        f.write("## ROC & PR (calibrated)\n\n")
+        f.write(f"![ROC/PR](../figures/{os.path.basename(out_fig)})\n\n")
+
+        # Sanity checks
+        f.write("## Quick sanity checks\n\n")
+        f.write(f"- Monotonicity (FPR budgets): recall ↑, threshold ↓, alerts ↑ … {_badge(f_ok)}\n")
+        f.write(f"- Monotonicity (Top-K): precision ↓, recall ↑, FPR ↑, threshold ↓ … {_badge(t_ok)}\n")
+        f.write("- Units: budgets are **percent**, `fpr` column is a **fraction**.\n")
+        f.write(f"- Day math: `alerts_per_day = alerts / {unique_days}`.\n")
+        f.write("- Calibration: thresholds are probabilities in [0,1].\n\n")
+
+        # How to use
+        f.write("## How to use this\n\n")
+        f.write("- **Risk budgeted** (e.g., “allow ~0.5% FPR”): pick the **0.5** row and set **τ** to its `threshold_prob`.\n")
+        f.write("- **Capacity constrained** (e.g., “review ~X/day”): pick the **Top-K%** row whose `alerts/day ≈ X` and set **τ** to that row’s `threshold_prob`.\n")
+
+    print(f"Wrote Markdown report → {md_path}")
+
 if __name__ == "__main__":
     main()

@@ -153,4 +153,47 @@ The model emphasizes card features, transaction amount, address, and time-derive
 ---
 
 
+## Calibration & Operating Points (probability-space)
 
+We calibrate scores to probabilities and report actionable thresholds.
+
+- **Calibration report:** `data/interim/reports/calibration_report.md`
+- **Operating points (per-run):**  
+  `data/interim/reports/baseline_operating_points_isotonic_calibrated_2025_09_08_14_07_49.md`
+- **Calibrated ROC/PR:**  
+  `data/interim/figures/roc_pr_calibrated_run_2025_09_08_14_07_49.png`
+
+<p float="left">
+  <img src="data/interim/figures/roc_pr_calibrated_run_2025_09_08_14_07_49.png" width="70%" />
+</p>
+
+**Notes**
+- Thresholds are now in **probability space** (e.g., τ = 0.92 means 92% fraud risk).
+- **Top-K policy:** deterministic ordering `p_cal ↓, time ↑, id ↑`; exactly Nₖ alerts; predict 1 if `p_cal ≥ τ`.
+- **FPR budgets:** we pick the **largest τ** with **FPR ≤ budget**; FPR reported as a **fraction** (e.g., 0.005 = 0.5%).
+- **Alerts/day:** `alerts / (# unique days in the window)`.
+
+---
+
+## Quickstart: reproduce artifacts
+
+```bash
+# 0) setup metadata & run_id
+python eval/phase_00_setup.py
+
+# 1) Top-K (pre-calibration, on frozen Phase-0 file)
+python eval/phase_01_topk_table.py
+
+# 2) Recall@FPR (pre-calibration)
+python eval/phase_02_recall_at_fpr_table.py
+
+# 3) Calibration (fits isotonic + Platt, writes report & figures)
+python eval/phase_03_calibration.py
+
+# 4) Curves & operating points AFTER calibration (probability-space thresholds)
+python eval/phase_04_curves_after_calibration.py
+
+- Artifacts saved:  
+  -Reports: data/interim/reports/
+  -Figures: data/interim/figures/
+  -Models (calibrator): models/
